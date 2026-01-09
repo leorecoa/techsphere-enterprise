@@ -35,7 +35,7 @@ const App: React.FC = () => {
         const data = await ProductAPI.getAllProducts();
         setProducts(data);
       } catch (error) {
-        showNotification("Erro ao conectar com a base de dados.", "error");
+        console.error("Erro ao conectar com a base de dados:", error);
       } finally {
         setIsLoading(false);
       }
