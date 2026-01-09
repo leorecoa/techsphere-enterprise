@@ -2,38 +2,35 @@
 import { GoogleGenAI } from "@google/genai";
 import { Product } from "../types";
 
-// Serviço para obter resposta do assistente Gemini TechSphere
+// Serviço otimizado para custo e performance
 export const getGeminiAssistantResponse = async (userMessage: string, currentProducts: Product[]) => {
   try {
-    // Inicialização do cliente seguindo as diretrizes oficiais (usando o objeto de configuração nomeado)
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
-    // Prepara o contexto do produto dinamicamente baseado no estoque atual do MongoDB
+    // Otimização: Enviamos apenas os dados essenciais para economizar tokens
     const productContext = currentProducts.map(p => 
-      `${p.name} (${p.category}): R$ ${p.price}. ${p.description} [Estoque: ${p.stock}]`
-    ).join('\n');
+      `${p.name}: R$${p.price} [Estoque:${p.stock}]`
+    ).join('; ');
 
-    // Executa a geração de conteúdo utilizando o modelo gemini-3-flash-preview conforme as regras de tarefa de texto básico/Q&A
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `You are a helpful tech shopping assistant at TechSphere. 
-      Available products in our MongoDB database:
-      ${productContext}
-      
-      User message: ${userMessage}
-      
-      Provide helpful, concise advice in Portuguese (pt-BR). If recommending a product, mention its price and main feature. 
-      Crucial: If a product is out of stock (Estoque: 0), mention that it is currently unavailable.`,
+      contents: `Contexto TechSphere: ${productContext}
+      User: ${userMessage}`,
       config: {
-        temperature: 0.7,
+        systemInstruction: `Você é o TechSphere AI. Seja extremamente conciso e técnico. 
+        Responda em pt-BR. Use no máximo 2 frases. 
+        Sempre informe se o produto está indisponível caso o estoque seja 0.
+        Não use saudações longas. Vá direto ao ponto.`,
+        temperature: 0.6,
         topP: 0.9,
+        // Otimização de custo: Limita o tamanho da resposta da IA
+        maxOutputTokens: 150,
       }
     });
 
-    // Extrai o texto da resposta acessando a propriedade .text (não é um método)
-    return response.text || "Desculpe, não consegui processar sua solicitação agora.";
+    return response.text || "Estou com dificuldades técnicas, tente novamente em instantes.";
   } catch (error) {
     console.error("Gemini AI Error:", error);
-    return "Ocorreu um erro ao falar com o assistente TechSphere. Por favor, tente novamente.";
+    return "Erro na conexão com o assistente. Verifique sua rede.";
   }
 };

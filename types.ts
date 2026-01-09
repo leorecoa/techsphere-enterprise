@@ -18,7 +18,6 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
-// Fixed: Added ChatMessage interface which was missing and causing compilation errors in GeminiAssistant.tsx
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
