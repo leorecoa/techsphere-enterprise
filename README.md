@@ -24,4 +24,10 @@ TechSphere é uma plataforma de e-commerce de tecnologia de alto padrão, desenv
 - **Ícones:** Font Awesome 6
 
 ---
-Desenhado com foco em performance e estética por [Seu Nome].
+Desenhado com foco em performance e estética por 
+<p align="center">
+</a>
+  <a href="https://www.linkedin.com/in/leandro-jess%C3%A9-7b575539a/">
+    <img src="https://img.shields.io/badge/LinkedIn-Leandro%20Jesse-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
+  </a>
+</p>
