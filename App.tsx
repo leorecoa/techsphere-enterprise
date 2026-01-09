@@ -8,6 +8,10 @@ import Hero from './components/Hero';
 import ProductCard from './components/ProductCard';
 import CartModal from './components/CartModal';
 import ProductModal from './components/ProductModal';
+import Features from './components/Features';
+import Brands from './components/Brands';
+import Newsletter from './components/Newsletter';
+import Footer from './components/Footer';
 
 const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,12 +26,10 @@ const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'default' | 'price_asc' | 'price_desc' | 'rating'>('default');
 
-  // Persistir carrinho no LocalStorage
   useEffect(() => {
     localStorage.setItem('techsphere_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Carregar dados iniciais do MongoDB (ou Mock se offline)
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -35,7 +37,7 @@ const App: React.FC = () => {
         const data = await ProductAPI.getAllProducts();
         setProducts(data);
       } catch (error) {
-        console.error("Erro ao conectar com a base de dados:", error);
+        console.error("Erro ao carregar produtos:", error);
       } finally {
         setIsLoading(false);
       }
@@ -62,7 +64,7 @@ const App: React.FC = () => {
     const bgColor = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
     const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
     
-    toast.className = `fixed top-10 right-10 z-[120] ${bgColor} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-bounce transition-all duration-300`;
+    toast.className = `fixed bottom-10 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:top-10 md:right-10 z-[120] ${bgColor} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-bounce transition-all duration-300 w-[90%] md:w-auto`;
     toast.innerHTML = `<i class="fas ${icon}"></i> <span class="font-bold">${message}</span>`;
     
     document.body.appendChild(toast);
@@ -120,25 +122,29 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-slate-50 overflow-x-hidden">
       <Header 
         cartCount={cartItems.reduce((acc, curr) => acc + curr.quantity, 0)}
         onCartToggle={() => setIsCartOpen(true)}
         onSearch={setSearchTerm}
       />
 
-      <main className="flex-1 pb-20">
+      <main className="flex-1">
         <Hero />
+        
+        {/* Confiança & Benefícios */}
+        <Features />
 
         {/* Categories Section */}
-        <section className="container mx-auto px-4 mb-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+        <section id="products" className="container mx-auto px-4 mb-16 scroll-mt-32">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div className="flex-1">
-              <h2 className="text-3xl font-black text-dark font-poppins mb-6">Explore o Futuro</h2>
-              <div className="flex gap-4 overflow-x-auto scroll-hide pb-4">
+              <span className="text-primary font-black uppercase tracking-[0.3em] text-[10px] mb-2 block">Premium Catalog</span>
+              <h2 className="text-3xl md:text-4xl font-black text-dark font-poppins mb-6">Explore o Futuro</h2>
+              <div className="flex gap-4 overflow-x-auto scroll-hide pb-4 -mx-4 px-4 md:mx-0 md:px-0">
                 <button 
                   onClick={() => setActiveCategory(CategoryType.ALL)}
-                  className={`px-6 py-4 rounded-2xl flex items-center gap-3 min-w-max transition-all font-bold ${activeCategory === CategoryType.ALL ? 'bg-primary text-white shadow-lg' : 'bg-white border hover:border-primary/40 text-dark'}`}
+                  className={`px-8 py-5 rounded-3xl flex items-center gap-3 min-w-max transition-all font-bold text-sm ${activeCategory === CategoryType.ALL ? 'bg-primary text-white shadow-xl shadow-primary/25' : 'bg-white border hover:border-primary/40 text-dark'}`}
                 >
                   <i className="fas fa-th-large"></i> Todos
                 </button>
@@ -146,7 +152,7 @@ const App: React.FC = () => {
                   <button 
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`px-6 py-4 rounded-2xl flex items-center gap-3 min-w-max transition-all font-bold ${activeCategory === cat.id ? 'bg-primary text-white shadow-lg' : 'bg-white border hover:border-primary/40 text-dark'}`}
+                    className={`px-8 py-5 rounded-3xl flex items-center gap-3 min-w-max transition-all font-bold text-sm ${activeCategory === cat.id ? 'bg-primary text-white shadow-xl shadow-primary/25' : 'bg-white border hover:border-primary/40 text-dark'}`}
                   >
                     <i className={`fas ${cat.icon}`}></i> {cat.name}
                   </button>
@@ -154,12 +160,12 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-200">
-              <span className="text-xs font-black text-slate-400 uppercase px-3">Ordenar:</span>
+            <div className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-200 self-start md:self-auto">
+              <span className="text-[10px] font-black text-slate-400 uppercase px-3 whitespace-nowrap">Order By:</span>
               <select 
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-transparent text-sm font-bold text-secondary outline-none pr-4"
+                className="bg-transparent text-sm font-bold text-secondary outline-none pr-4 cursor-pointer"
               >
                 <option value="default">Destaques</option>
                 <option value="price_asc">Menor Preço</option>
@@ -168,22 +174,20 @@ const App: React.FC = () => {
               </select>
             </div>
           </div>
-        </section>
 
-        {/* Product Grid */}
-        <section className="container mx-auto px-4">
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-3xl h-[480px] animate-pulse p-6 border border-slate-100">
-                  <div className="bg-slate-100 h-64 rounded-2xl w-full mb-4"></div>
-                  <div className="bg-slate-100 h-4 rounded w-1/4 mb-3"></div>
-                  <div className="bg-slate-100 h-8 rounded w-3/4"></div>
+                <div key={i} className="bg-white rounded-[2.5rem] h-[520px] animate-pulse p-8 border border-slate-100">
+                  <div className="bg-slate-100 h-64 rounded-3xl w-full mb-6"></div>
+                  <div className="bg-slate-100 h-4 rounded w-1/4 mb-4"></div>
+                  <div className="bg-slate-100 h-8 rounded w-3/4 mb-4"></div>
+                  <div className="bg-slate-100 h-10 rounded w-full mt-auto"></div>
                 </div>
               ))}
             </div>
           ) : filteredAndSortedProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
               {filteredAndSortedProducts.map(product => (
                 <ProductCard 
                   key={product._id} 
@@ -195,15 +199,30 @@ const App: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="py-32 text-center bg-white rounded-[3rem] border-2 border-dashed border-slate-200">
-              <i className="fas fa-search text-3xl text-slate-300 mb-6"></i>
-              <h3 className="text-xl font-bold text-dark mb-2">Ops! Nada por aqui.</h3>
-              <p className="text-gray mb-6">Tente ajustar seus filtros ou busca.</p>
-              <button onClick={() => {setSearchTerm(''); setActiveCategory(CategoryType.ALL);}} className="px-8 py-3 bg-primary text-white font-bold rounded-xl">Limpar Tudo</button>
+            <div className="py-24 text-center bg-white rounded-[3rem] border-2 border-dashed border-slate-200">
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="fas fa-search text-3xl text-slate-300"></i>
+              </div>
+              <h3 className="text-2xl font-bold text-dark mb-2">Ops! Nada encontrado</h3>
+              <p className="text-gray mb-8 max-w-md mx-auto">Não encontramos nenhum produto que combine com sua busca ou categoria selecionada.</p>
+              <button 
+                onClick={() => {setSearchTerm(''); setActiveCategory(CategoryType.ALL);}} 
+                className="px-10 py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 hover:scale-105 transition-all active:scale-95"
+              >
+                Ver todos os produtos
+              </button>
             </div>
           )}
         </section>
+
+        {/* Marcas Parceiras */}
+        <Brands />
+
+        {/* Newsletter Section */}
+        <Newsletter />
       </main>
+
+      <Footer />
 
       <CartModal 
         isOpen={isCartOpen}
